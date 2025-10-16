@@ -1,0 +1,63 @@
+services:
+  ui-internal-ts:
+    container_name: inethi-v1-ui-ts-prod
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    env_file:
+      - .env.local
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    networks:
+      - inethi-bridge-traefik
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      # Add writable directories for Next.js
+      - /app/.next/cache:uid=1001,gid=1001
+      - /app/.next/standalone/.next/cache:uid=1001,gid=1001
+      - /home/nextjs/.npm:uid=1001,gid=1001
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 256M
+          cpus: "0.25"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.v1-ui-ts.rule=Host(`v1.ui.inethicloud.net`)"
+      - "traefik.http.routers.v1-ui-ts.entrypoints=websecure"
+      - "traefik.http.services.v1-ui-ts.loadbalancer.server.port=3000"
+      - "traefik.http.routers.v1-ui-ts.tls.certresolver=letsencrypt"
+
+networks:
+  inethi-bridge-traefik:
+    external: true

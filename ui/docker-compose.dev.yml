@@ -1,0 +1,27 @@
+services:
+  ui-internal-ts:
+    container_name: ui-internal-ts-dev
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    env_file:
+      - .env.local
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - ui-internal-network
+    command: npm run dev
+
+networks:
+  ui-internal-network:
+    driver: bridge
