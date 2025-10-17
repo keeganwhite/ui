@@ -6,6 +6,7 @@ import {
   IconDashboard,
   IconNetwork,
   IconWallet,
+  IconUsers,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -21,8 +22,8 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 
-const data = {
-  navMain: [
+const getNavItems = (isSuperuser: boolean) => {
+  const baseItems = [
     {
       title: "Dashboard",
       url: "/dashboard",
@@ -52,21 +53,43 @@ const data = {
         },
       ],
     },
-    {
-      title: "Rewards",
-      url: "/rewards",
-      icon: IconGift,
-    },
-  ],
+  ];
+
+  // Add Users menu item for superusers only
+  if (isSuperuser) {
+    baseItems.push({
+      title: "Users",
+      url: "/admin/users",
+      icon: IconUsers,
+    });
+  }
+
+  baseItems.push({
+    title: "Rewards",
+    url: "/rewards",
+    icon: IconGift,
+  });
+
+  return baseItems;
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [isSuperuser, setIsSuperuser] = React.useState(false);
+
+  React.useEffect(() => {
+    // Check if user is superuser from localStorage
+    const superuserStatus = localStorage.getItem("is_superuser") === "true";
+    setIsSuperuser(superuserStatus);
+  }, []);
+
   const username = localStorage.getItem("auth_username");
   const user = {
     name: username || "Unknown",
     email: `${username}@example.com`,
     avatar: "/icons/profile-picture.png",
   };
+
+  const navItems = getNavItems(isSuperuser);
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -88,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />

@@ -552,3 +552,57 @@ export interface UseTransactionsReturn {
   currentPage: number;
   totalPages: number;
 }
+
+// Admin User Management Types
+export interface AdminUser {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string | null;
+  radiusdesk_username: string | null;
+  radiusdesk_password: string | null;
+  imsi: string | null;
+  product_id_data: string | null;
+  product_id_cents: string | null;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  has_imsi: boolean;
+  has_wallet: boolean;
+  wallet_address: string | null;
+}
+
+export interface AdminUserFilters {
+  has_imsi?: boolean;
+  has_wallet?: boolean;
+  is_active?: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  search?: string;
+}
+
+export interface AdminUserListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: AdminUser[];
+}
+
+export interface AdminUserUpdatePayload {
+  email?: string;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  radiusdesk_username?: string;
+  radiusdesk_password?: string;
+  imsi?: string;
+  product_id_data?: string;
+  product_id_cents?: string;
+  is_active?: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  password?: string;
+}
